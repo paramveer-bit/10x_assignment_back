@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Telemetry" ALTER COLUMN "timestampMs" DROP NOT NULL,
+ALTER COLUMN "timestampMs" SET DATA TYPE DOUBLE PRECISION;

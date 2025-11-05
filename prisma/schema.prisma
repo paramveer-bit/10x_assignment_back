@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Wall {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  width     Int
+  height    Int
+  obstacles Json     @default("[]") // JSON array of [x,y] coordinates
+  createdAt DateTime @default(now())
+
+  // relations
+  trajectories Trajectory[]
+
+  @@index([createdAt])
+  @@map("walls")
+}
+
+model Trajectory {
+  id          Int      @id @default(autoincrement())
+  wallId      Int
+  wall        Wall     @relation(fields: [wallId], references: [id], onDelete: Cascade)
+  name        String?
+  pointsCount Int
+  length      Float
+  blobUri     String?
+  compressed  Boolean  @default(false)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  // relations
+  points     TrajectoryPoint[]
+  executions Execution[]
+
+  @@index([wallId])
+  @@map("trajectories")
+}
+
+model TrajectoryPoint {
+  id             Int        @id @default(autoincrement())
+  trajectoryId   Int
+  trajectory     Trajectory @relation(fields: [trajectoryId], references: [id], onDelete: Cascade)
+  seq            Int // sequence index (0-based)
+  x              Float
+  y              Float
+  yaw            Float? // optional desired heading
+  speed          Float?     @default(0.4)
+  nozzleOn       Boolean    @default(true)
+  dwellMs        Int?       @default(0)
+  expectedTimeMs BigInt? // planned arrival time in epoch ms (optional)
+  createdAt      DateTime   @default(now())
+
+  @@unique([trajectoryId, seq])
+  @@index([trajectoryId, seq])
+  @@map("trajectory_points")
+}
+
+model Execution {
+  id           Int             @id @default(autoincrement())
+  execId       String          @unique
+  trajectoryId Int?
+  trajectory   Trajectory?     @relation(fields: [trajectoryId], references: [id], onDelete: SetNull)
+  robotId      Int? // optional if you maintain a robots table
+  status       ExecutionStatus @default(PENDING)
+  startedAt    DateTime?
+  endedAt      DateTime?
+  totalTimeS   Float?
+  notes        String?
+  createdAt    DateTime        @default(now())
+
+  @@index([execId])
+  @@map("executions")
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  PAUSED
+  COMPLETED
+  ABORTED
+  ERROR
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  execId      String?
+  eventType   String
+  payload     Json
+  timestampMs BigInt
+  createdAt   DateTime @default(now())
+
+  @@index([execId, eventType])
+}
+
+model Telemetry {
+  id          Int      @id @default(autoincrement())
+  execId      String
+  seqCurrent  Int?
+  x           Float?
+  y           Float?
+  theta       Float?
+  speed       Float?
+  nozzleState Int?
+  batteryPct  Float?
+  deviationM  Float?
+  timestampMs Float?
+  createdAt   DateTime @default(now())
+
+  @@index([execId, timestampMs])
+}
