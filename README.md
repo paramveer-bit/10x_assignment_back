@@ -32,7 +32,8 @@ This repository implements:
   - Prisma schema: [prisma/schema.prisma](prisma/schema.prisma)
   - Migrations: [prisma/migrations/](prisma/migrations/)
   - Runtime Prisma client helper: [src/Db/index.ts](src/Db/index.ts)
-
+- Frontend Repo
+  - https://github.com/paramveer-bit/10x_assignment_front
 ## How it works (high level)
 1. API creates a trajectory from a wall: controller [`createTrajectory`](src/api/controllers/controller.ts) creates Trajectory and TrajectoryPoint rows.
 2. When API requests execution start, it creates an Execution row and publishes a start message for the executor ([src/api/controllers/controller.ts](src/api/controllers/controller.ts)).
