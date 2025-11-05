@@ -41,6 +41,9 @@ This repository implements:
 4. [`startExecution`](src/Executor/stream.ts) loads waypoint rows, converts them via [`zWaypoint`](src/Executor/Types/types.ts) and streams them to the robot using MQTT. It uses [src/Executor/waiters.ts](src/Executor/waiters.ts) to await ACKs.
 5. Robot(s) respond with ACK / WAYPOINT_REACHED / TELEMETRY. Messages are consumed by the executor's MQTT subscriptions and handled by [`handleRobotMessage`](src/Executor/Handlers/messgaeHandlers.ts), which persists events and telemetry.
 
+      <img width="928" height="496" alt="image" src="https://github.com/user-attachments/assets/98d51e02-fbcc-44f9-aa82-4e4129b39e01" />
+      
+
 ## Running locally (dev)
 1. Install deps:
    ```
